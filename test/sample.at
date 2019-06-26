@@ -1,0 +1,19 @@
+defined CustomType object (
+    required name - string
+)
+
+defined Widget is one of (
+    a,
+    b,
+    c,
+    object (
+        required x - number,
+        option y - string
+    ),
+    one of (
+        one,
+        array of CustomType
+    )
+)
+
+required Widget

@@ -1,0 +1,23 @@
+{
+  "name": "anytype",
+  "version": "1.0.0",
+  "description": "Validator",
+  "main": "index.js",
+  "scripts": {
+    "build": "nearleyc grammar/anytype.ne -o grammar/index.js",
+    "test": "npm run build && node index.spec.js"
+  },
+  "keywords": [
+    "xml",
+    "validation",
+    "xsd"
+  ],
+  "author": "Sergei Terehov",
+  "license": "ISC",
+  "dependencies": {
+    "nearley": "^2.16.0"
+  },
+  "devDependencies": {
+    "chalk": "^2.4.2"
+  }
+}
