@@ -1,5 +1,9 @@
 defined CustomType object (
-    required name - string
+    required name - string,
+    option age - number,
+    option parent - object (
+        required name - string
+    )
 )
 
 defined Widget is one of (

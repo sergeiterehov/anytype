@@ -7,7 +7,7 @@ Expression ->
     | Statements {% (d) => ({$: "entry", statements: d[0]}) %}
     | Main {% (d) => ({$: "entry", main: d[0]}) %}
 
-Main -> Uses __ Type {% (d) => ({$: "main", uses: d[0], type: d[2]}) %}
+Main -> Uses __ Type {% (d) => ({$: "main", uses: d[0].uses, type: d[2]}) %}
 
 Statements ->
     Statement
@@ -19,7 +19,7 @@ Statement ->
 	
 Type ->
 	"one of" _ ListBody {% (d) => ({$: "type_rule", type_rule: "one_of", list: d[2]}) %}
-	| "object" _ ObjectBody {% (d) => ({$: "type_rule", type_rule: "object", fileds: d[2]}) %}
+	| "object" _ ObjectBody {% (d) => ({$: "type_rule", type_rule: "object", fields: d[2]}) %}
 	| "array of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[2]}) %}
 	| Name {% (d) => ({$: "type_rule", type_rule: "name", name: d[0].name}) %}
 
