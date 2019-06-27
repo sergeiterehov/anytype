@@ -1,22 +1,13 @@
-defined CustomType object (
-    required name - string,
-    option age - number,
-    option parent - object (
-        required name - string
+defined Widget is object (
+    option sName - string,
+    option data - array of one of (
+        UniversalExtendedCardWidgetData
     )
 )
 
-defined Widget is one of (
-    a,
-    b,
-    c,
-    object (
-        required x - number,
-        option y - string
-    ),
-    one of (
-        one,
-        array of CustomType
+defined UniversalExtendedCardWidgetData is object (
+    option line - array of object (
+        required yCoordFrom - integer
     )
 )
 
