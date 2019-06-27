@@ -15,6 +15,12 @@ defined Measure is object (
     option sMeasureName_EN - string
 )
 
+defined Actions is object (
+    option actions - object (
+        option action - array of any
+    )
+)
+
 defined UniversalExtendedCardWidgetData is object (
     option line - array [0..1000] of object (
         required yCoordFrom - integer
@@ -22,6 +28,7 @@ defined UniversalExtendedCardWidgetData is object (
     required object - array of one of (
         object (
             with Measure,
+            with Actions,
             required sObjectType - value "deviation",
             required sName - string,
             required fValue - integer,
