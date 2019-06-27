@@ -5,9 +5,29 @@ defined Widget is object (
     )
 )
 
+defined Boolean is one of (
+    value 1,
+    value 0
+)
+
+defined Measure is object (
+    option sMeasureName_RU - string,
+    option sMeasureName_EN - string
+)
+
 defined UniversalExtendedCardWidgetData is object (
-    option line - array of object (
+    option line - array [0..1000] of object (
         required yCoordFrom - integer
+    ),
+    required object - array of one of (
+        object (
+            with Measure,
+            required sObjectType - value "deviation",
+            required sName - string,
+            required fValue - integer,
+            option nPrecision - integer,
+            option isGood - Boolean
+        )
     )
 )
 

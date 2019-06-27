@@ -1,4 +1,5 @@
 const util = require("util");
+const { xmlToObject } = require("./xmlToObject");
 const fs = require("fs");
 const nearley = require("nearley");
 const grammar = require("./grammar");
@@ -30,7 +31,15 @@ const mapType = (type, required = false) => {
         const keys = {};
 
         type.fields.forEach((field) => {
-            keys[field.name] = mapType(field.type, field.uses === "required");
+            if (field.$ === "with") {
+                if (! schema.includes) {
+                    schema.includes = [];
+                }
+
+                schema.includes.push(field.name);
+            } else {
+                keys[field.name] = mapType(field.type, field.uses === "required");
+            }
         });
 
         schema.$type = "object";
@@ -46,6 +55,10 @@ const mapType = (type, required = false) => {
     } else if (type.type_rule === "name") {
         schema.$type = "custom";
         schema.name = type.name;
+    } else if (type.type_rule === "value") {
+        schema.$type = "value";
+        schema.type = type.type;
+        schema.value = type.value;
     }
 
     if (required) {
@@ -80,7 +93,12 @@ const mapResult = (lex) => {
 
 results.forEach(mapResult);
 
-console.log(util.inspect({
-    schema,
-    entry,
-}, { colors: true, depth: 1000 }));
+// console.log(util.inspect({
+//     schema,
+//     entry,
+// }, { colors: true, depth: 1000 }));
+
+
+const xml = fs.readFileSync("./test/sample.xml");
+
+// xmlToObject(xml).then((data) => console.log(util.inspect(data, { colors: true, depth: 1000 })));

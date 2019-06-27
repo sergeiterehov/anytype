@@ -16,11 +16,15 @@ Statements ->
 Statement ->
 	"defined" __ Name __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[4]}) %}
 	| "defined" __ Name __ "is" __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[6]}) %}
-	
+
 Type ->
 	"one of" _ ListBody {% (d) => ({$: "type_rule", type_rule: "one_of", list: d[2]}) %}
 	| "object" _ ObjectBody {% (d) => ({$: "type_rule", type_rule: "object", fields: d[2]}) %}
 	| "array of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[2]}) %}
+	| "array" __ "[" _ Integer _ ".." _ Integer "]" __ "of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[13], limits: [d[4], d[8]]}) %}
+	| "value" __ String {% (d) => ({$: "type_rule", type_rule: "value", type: "string", value: d[2]}) %}
+	| "value" __ Float {% (d) => ({$: "type_rule", type_rule: "value", type: "float", value: d[2]}) %}
+	| "value" __ Integer {% (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]}) %}
 	| Name {% (d) => ({$: "type_rule", type_rule: "name", name: d[0].name}) %}
 
 Pair -> Uses __ Name __ "-" __ Type {% (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6]}) %}
@@ -32,8 +36,12 @@ TypeList ->
 	| TypeList _ "," _ Type {% (d) => [...d[0], d[4]] %}
 
 PairList ->
-	Pair
-	| PairList _ "," _ Pair {% (d) => [...d[0], d[4]] %}
+	_pairOfList
+	| PairList _ "," _ _pairOfList {% (d) => [...d[0], d[4]] %}
+
+_pairOfList ->
+	Pair {% id %}
+	| "with" __ Name {% (d) => ({$: "with", name: d[2].name}) %}
 
 ListBody ->
 	"(" _ TypeList _ ")" {% (d) => d[2] %}
@@ -47,3 +55,17 @@ Name -> _name {% (d) => ({$: "name", name: d[0]}) %}
  
 _name -> [a-zA-Z_] {% id %}
 	| _name [\w_] {% (d) => d[0] + d[1] %}
+
+Float -> Integer "." Integer   {% (d) => parseFloat(d[0] + d[1] + d[2]) %}
+
+Integer -> [0-9]:+ {% (d) => Number(d[0].join("")) %}
+
+String -> "\"" _string "\"" {% (d) => d[1] %}
+ 
+_string ->
+	null {% () => "" %}
+	| _string _stringchar {% (d) => d[0] + d[1] %}
+ 
+_stringchar ->
+	[^\\"] {% id %}
+	| "\\" [^] {% (d) => JSON.parse("\"" + d[0] + d[1] + "\"") %}
