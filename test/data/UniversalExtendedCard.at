@@ -1,0 +1,18 @@
+import "../helpers"
+
+defined UniversalExtendedCardWidgetData is object (
+    option line - array [0..1000] of object (
+        required yCoordFrom - integer
+    ),
+    required object - array of one of (
+        object (
+            with Measure,
+            with Actions,
+            required sObjectType - value "deviation",
+            required sName - string,
+            required fValue - integer,
+            option nPrecision - integer,
+            option isGood - Boolean
+        )
+    )
+)

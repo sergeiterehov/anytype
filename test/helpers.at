@@ -1,0 +1,15 @@
+defined Boolean is one of (
+    value 1,
+    value 0
+)
+
+defined Measure is object (
+    option sMeasureName_RU - string,
+    option sMeasureName_EN - string
+)
+
+defined Actions is object (
+    option actions - object (
+        option action - array of any
+    )
+)

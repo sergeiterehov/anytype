@@ -12,7 +12,12 @@ var grammar = {
     {"name": "__$ebnf$1", "symbols": ["__$ebnf$1", "wschar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "__", "symbols": ["__$ebnf$1"], "postprocess": function(d) {return null;}},
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
-    {"name": "FullContent", "symbols": ["_", "Expression", "_"], "postprocess": (d) => d[1]},
+    {"name": "File", "symbols": ["_", "Expression", "_"], "postprocess": (d) => d[1]},
+    {"name": "File", "symbols": ["_", "Imports", "__", "Expression", "_"], "postprocess": (d) => ({...d[3], imports: d[1]})},
+    {"name": "Imports", "symbols": ["Import"]},
+    {"name": "Imports", "symbols": ["Imports", "__", "Import"], "postprocess": (d) => [...d[0], d[2]]},
+    {"name": "Import$string$1", "symbols": [{"literal":"i"}, {"literal":"m"}, {"literal":"p"}, {"literal":"o"}, {"literal":"r"}, {"literal":"t"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "Import", "symbols": ["Import$string$1", "__", "String"], "postprocess": (d) => ({$: "import", file: d[2]})},
     {"name": "Expression", "symbols": ["Statements", "__", "Main"], "postprocess": (d) => ({$: "entry", statements: d[0], main: d[2]})},
     {"name": "Expression", "symbols": ["Statements"], "postprocess": (d) => ({$: "entry", statements: d[0]})},
     {"name": "Expression", "symbols": ["Main"], "postprocess": (d) => ({$: "entry", main: d[0]})},
@@ -71,7 +76,7 @@ var grammar = {
     {"name": "_stringchar", "symbols": [/[^\\"]/], "postprocess": id},
     {"name": "_stringchar", "symbols": [{"literal":"\\"}, /[^]/], "postprocess": (d) => JSON.parse("\"" + d[0] + d[1] + "\"")}
 ]
-  , ParserStart: "FullContent"
+  , ParserStart: "File"
 }
 if (typeof module !== 'undefined'&& typeof module.exports !== 'undefined') {
    module.exports = grammar;

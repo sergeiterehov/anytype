@@ -1,6 +1,14 @@
 @builtin "whitespace.ne"
 
-FullContent -> _ Expression _ {% (d) => d[1] %}
+File ->
+	_ Expression _ {% (d) => d[1] %}
+	| _ Imports __ Expression _ {% (d) => ({...d[3], imports: d[1]}) %}
+
+Imports ->
+	Import
+	| Imports __ Import {% (d) => [...d[0], d[2]] %}
+
+Import -> "import" __ String {% (d) => ({$: "import", file: d[2]}) %}
 
 Expression ->
     Statements __ Main {% (d) => ({$: "entry", statements: d[0], main: d[2]}) %}
