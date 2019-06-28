@@ -30,6 +30,7 @@ Type ->
 	| "object" _ ObjectBody {% (d) => ({$: "type_rule", type_rule: "object", fields: d[2]}) %}
 	| "array of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[2]}) %}
 	| "array" __ "[" _ Integer _ ".." _ Integer "]" __ "of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[13], limits: [d[4], d[8]]}) %}
+	| "single" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[2], limits: [1, 1]}) %}
 	| "value" __ String {% (d) => ({$: "type_rule", type_rule: "value", type: "string", value: d[2]}) %}
 	| "value" __ Float {% (d) => ({$: "type_rule", type_rule: "value", type: "float", value: d[2]}) %}
 	| "value" __ Integer {% (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]}) %}

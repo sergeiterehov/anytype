@@ -67,6 +67,13 @@ const parseAtFile = (file, processedFiles = []) => {
             schema.list = type.list.map((type) => mapType(type, false));
         } else if (type.type_rule === "array_of") {
             schema.$type = "array";
+            if (type.limits) {
+                const [min, max] = type.limits;
+
+                schema.min = min;
+                schema.max = max;
+            }
+
             schema.element = mapType(type.type);
         } else if (type.type_rule === "name") {
             schema.$type = "custom";

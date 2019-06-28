@@ -12,7 +12,11 @@ defined UniversalExtendedCardWidgetData is object (
             required sName - string,
             required fValue - integer,
             option nPrecision - integer,
-            option isGood - Boolean
+            option isGood - Boolean,
+            option arrow - single object (
+                required nDirection - integer,
+                option isGood - integer
+            )
         )
     )
 )
