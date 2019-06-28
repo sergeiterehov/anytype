@@ -2,6 +2,6 @@ const util = require("util");
 const path = require("path");
 const { parseAtFile } = require("./parseAtFile");
 
-const data = parseAtFile(path.join(__dirname, "test/sample.at"));
+const data = parseAtFile(path.join(__dirname, "test/widget.at"));
 
 console.log(util.inspect(data, { colors: true, depth: 1000 }));
