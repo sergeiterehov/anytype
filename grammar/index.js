@@ -30,7 +30,7 @@ var grammar = {
     {"name": "Statement$string$3", "symbols": [{"literal":"i"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Statement", "symbols": ["Statement$string$2", "__", "Name", "__", "Statement$string$3", "__", "Type"], "postprocess": (d) => ({$: "definition", name: d[2].name, type: d[6]})},
     {"name": "Type$string$1", "symbols": [{"literal":"o"}, {"literal":"n"}, {"literal":"e"}, {"literal":" "}, {"literal":"o"}, {"literal":"f"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "Type", "symbols": ["Type$string$1", "_", "ListBody"], "postprocess": (d) => ({$: "type_rule", type_rule: "one_of", list: d[2]})},
+    {"name": "Type", "symbols": ["Type$string$1", "_", "ListBody"], "postprocess": (d) => ({$: "type_rule", type_rule: "one_of", types: d[2]})},
     {"name": "Type$string$2", "symbols": [{"literal":"o"}, {"literal":"b"}, {"literal":"j"}, {"literal":"e"}, {"literal":"c"}, {"literal":"t"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Type", "symbols": ["Type$string$2", "_", "ObjectBody"], "postprocess": (d) => ({$: "type_rule", type_rule: "object", fields: d[2]})},
     {"name": "Type$string$3", "symbols": [{"literal":"a"}, {"literal":"r"}, {"literal":"r"}, {"literal":"a"}, {"literal":"y"}, {"literal":" "}, {"literal":"o"}, {"literal":"f"}], "postprocess": function joiner(d) {return d.join('');}},

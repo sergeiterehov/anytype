@@ -7,4 +7,6 @@ defined Widget is object (
     )
 )
 
-required Widget
+required object (
+    required widget - Widget
+)

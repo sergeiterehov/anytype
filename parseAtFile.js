@@ -5,7 +5,7 @@ const path = require("path");
 const nearley = require("nearley");
 const grammar = nearley.Grammar.fromCompiled(require("./grammar"));
 
-const parseAtFile = (file, processedFiles = []) => {
+const parseAtFile = (file, end = [], processedFiles = []) => {
     // Сохраняем информацию, что файл обработан.
     processedFiles.push(path.normalize(file));
 
@@ -20,10 +20,10 @@ const parseAtFile = (file, processedFiles = []) => {
 
     // console.log(util.inspect(results, { colors: true, depth: 1000 }));
 
-    const schema = {};
+    const types = {};
     let entry = null;
 
-    const mapImport = (item) => {
+    const mapImport = (types, item) => {
         const dir = path.dirname(path.normalize(file));
         const baseName = item.file + (/\.ne$/.test(item.file) ? "" : ".at");
         const src = path.join(dir, baseName);
@@ -32,96 +32,119 @@ const parseAtFile = (file, processedFiles = []) => {
             return;
         }    
 
-        const data = parseAtFile(src, processedFiles);
+        const data = parseAtFile(src, end, processedFiles);
 
-        Object.entries(data.schema).forEach(([key, value]) => schema[key] = value);
+        Object.entries(data.types).forEach(([key, value]) => types[key] = value);
     };
 
-    const mapDefintion = (def) => {
-        schema[def.name] = mapType(def.type)
+    const setDefintion = (types, path, def) => {
+        setType(types, def.name, def.type);
+
+        types[def.name].defined = true;
     };
 
-    const mapType = (type, required = false) => {
-        let schema = {};
+    const setType = (types, path, type) => {
+        if (types[path]) {
+            return path;
+        }
 
+        if (type.$ === "type_rule") {
+            return setTypeRule(types, path, type);
+        }
+
+        return path;
+    };
+
+    const setTypeRule = (types, path, type) => {
         if (type.type_rule === "object") {
-            const keys = {};
+            const rule = {
+                $: "object",
+                fields: type.fields.filter((field) => field.$ === "pair").map((field) => {
+                    return {
+                        name: field.name,
+                        uses: field.uses,
+                        type: setType(types, `${path}.${field.name}`, field.type),
+                    };
+                }),
+            };
 
-            type.fields.forEach((field) => {
-                if (field.$ === "with") {
-                    if (! schema.includes) {
-                        schema.includes = [];
-                    }
+            type.fields.filter((field) => field.$ === "with").forEach((item) => {
+                const type = types[item.name];
 
-                    schema.includes.push(field.name);
-                } else {
-                    keys[field.name] = mapType(field.type, field.uses === "required");
+                if (! type) {
+                    throw new Error(`Object "${item.name}" not found`);
                 }
+
+                rule.fields.push(...type.fields);
             });
 
-            schema.$type = "object";
-            schema.keys = keys;
+            types[path] = rule;
         } else if (type.type_rule === "one_of") {
-            schema.$type = "group";
-            schema.operation = "one";
-            schema.list = type.list.map((type) => mapType(type, false));
-        } else if (type.type_rule === "array_of") {
-            schema.$type = "array";
-            if (type.limits) {
-                const [min, max] = type.limits;
+            const rule = {
+                $: "one_of",
+                types: type.types.map((type, i) => {
+                    return setType(types, `${path}(${i})`, type);
+                }),
+            };
 
-                schema.min = min;
-                schema.max = max;
+            types[path] = rule;
+        } else if (type.type_rule === "array_of") {
+            const rule = {
+                $: "array_of",
+                type: setType(types, `${path}[]`, type.type),
+            };
+
+            if (type.limits) {
+                rule.limits = type.limits;
             }
 
-            schema.element = mapType(type.type);
+            types[path] = rule;
         } else if (type.type_rule === "name") {
-            schema.$type = "custom";
-            schema.name = type.name;
-        } else if (type.type_rule === "value") {
-            schema.$type = "value";
-            schema.type = type.type;
-            schema.value = type.value;
-        }
-
-        if (required) {
-            return {
-                $type: "group",
-                operation: "all",
-                list: [
-                    { $type: "required" },
-                    schema,
-                ],
+            types[path] = {
+                $: type.name
             };
+        } else if (type.type_rule === "value") {
+            types[path] = {
+                $: "value",
+                type: type.type,
+                value: type.value,
+            };
+        } else {
+            throw new Error(`Unknown type_rule "${type.type_rule}"`);
         }
 
-        return schema;
+        return path;
     };
 
-    const mapResult = (lex) => {
+    const mapResult = (types, lex) => {
         if (lex.$ === "entry") {
             if (lex.imports) {
-                lex.imports.forEach(mapImport);
+                lex.imports.forEach((item) => mapImport(types, item));
             }
 
             if (lex.statements) {
-                lex.statements.forEach(mapResult);
+                lex.statements.forEach((item) => mapResult(types, item));
             }
 
             if (lex.main) {
-                mapResult(lex.main);
+                mapResult(types, lex.main);
             }
         } else if (lex.$ === "definition") {
-            mapDefintion(lex);
+            setDefintion(types, "", lex);
         } else if (lex.$ === "main") {
-            entry = mapType(lex.type, lex.uses === "required");
+            entry = {
+                uses: lex.uses,
+                type: setType(types, "$", lex.type),
+            };
         }
     };
 
-    results.forEach(mapResult);
+    results.forEach((item) => mapResult(types, item));
+
+    end.forEach((callback) => callback());
 
     return {
-        schema,
+        types,
         entry,
     };
 };

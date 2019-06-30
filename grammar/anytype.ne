@@ -26,7 +26,7 @@ Statement ->
 	| "defined" __ Name __ "is" __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[6]}) %}
 
 Type ->
-	"one of" _ ListBody {% (d) => ({$: "type_rule", type_rule: "one_of", list: d[2]}) %}
+	"one of" _ ListBody {% (d) => ({$: "type_rule", type_rule: "one_of", types: d[2]}) %}
 	| "object" _ ObjectBody {% (d) => ({$: "type_rule", type_rule: "object", fields: d[2]}) %}
 	| "array of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[2]}) %}
 	| "array" __ "[" _ Integer _ ".." _ Integer "]" __ "of" __ Type {% (d) => ({$: "type_rule", type_rule: "array_of", type: d[13], limits: [d[4], d[8]]}) %}
