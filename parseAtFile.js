@@ -24,9 +24,10 @@ const parseAtFile = (file, processedFiles = []) => {
     let entry = null;
 
     const mapImport = (types, item) => {
-        const dir = path.dirname(path.normalize(file));
-        const baseName = item.file + (/\.ne$/.test(item.file) ? "" : ".at");
-        const src = path.join(dir, baseName);
+        const src = path.resolve(
+            file,
+            item.file + (/\.ne$/.test(item.file) ? "" : ".at"),
+        );
 
         if (processedFiles.includes(src)) {
             return;

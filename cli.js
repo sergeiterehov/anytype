@@ -15,7 +15,7 @@ const program = new commander.Command(packageJson.name)
 .action((fileName) => {
     console.log(`Compile ${fileName} ...`);
 
-    const filePath = path.join(__dirname, fileName);
+    const filePath = path.resolve(fileName);
     const resultFilePath = `${filePath}.json`;
 
     const processedFiles = [];
