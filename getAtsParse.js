@@ -19,7 +19,7 @@ const getAtsParser = (getSourceByName) => {
         const mapImport = (types, item) => {
             const src = path.resolve(
                 path.dirname(file),
-                item.file + (/\.ne$/.test(item.file) ? "" : ".at"),
+                item.file + (/\.at$/.test(item.file) ? "" : ".at"),
             );
     
             if (processedFiles.includes(src)) {
