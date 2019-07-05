@@ -2,7 +2,7 @@ import "../helpers"
 
 defined UniversalExtendedCardWidgetData (This is widgets data!) is object (
     option line - array [0..1000] of object (
-        required yCoordFrom - integer
+        required yCoordFrom - name "integer"
     ),
     required cell (
         Это русский комментарий...

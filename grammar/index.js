@@ -47,6 +47,8 @@ var grammar = {
     {"name": "Type", "symbols": ["Type$string$9", "__", "Float"], "postprocess": (d) => ({$: "type_rule", type_rule: "value", type: "float", value: d[2]})},
     {"name": "Type$string$10", "symbols": [{"literal":"v"}, {"literal":"a"}, {"literal":"l"}, {"literal":"u"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Type", "symbols": ["Type$string$10", "__", "Integer"], "postprocess": (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]})},
+    {"name": "Type$string$11", "symbols": [{"literal":"n"}, {"literal":"a"}, {"literal":"m"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "Type", "symbols": ["Type$string$11", "__", "String"], "postprocess": (d) => ({$: "type_rule", type_rule: "name", name: d[2]})},
     {"name": "Type", "symbols": ["Name"], "postprocess": (d) => ({$: "type_rule", type_rule: "name", name: d[0].name})},
     {"name": "Pair", "symbols": ["Uses", "__", "CommentedName", "__", {"literal":"-"}, "__", "Type"], "postprocess": (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6], comment: d[2].comment})},
     {"name": "Uses$subexpression$1$string$1", "symbols": [{"literal":"r"}, {"literal":"e"}, {"literal":"q"}, {"literal":"u"}, {"literal":"i"}, {"literal":"r"}, {"literal":"e"}, {"literal":"d"}], "postprocess": function joiner(d) {return d.join('');}},

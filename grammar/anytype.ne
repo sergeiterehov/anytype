@@ -34,6 +34,7 @@ Type ->
 	| "value" __ String {% (d) => ({$: "type_rule", type_rule: "value", type: "string", value: d[2]}) %}
 	| "value" __ Float {% (d) => ({$: "type_rule", type_rule: "value", type: "float", value: d[2]}) %}
 	| "value" __ Integer {% (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]}) %}
+	| "name" __ String {% (d) => ({$: "type_rule", type_rule: "name", name: d[2]}) %}
 	| Name {% (d) => ({$: "type_rule", type_rule: "name", name: d[0].name}) %}
 
 Pair -> Uses __ CommentedName __ "-" __ Type {% (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6], comment: d[2].comment}) %}
