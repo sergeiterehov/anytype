@@ -5,7 +5,7 @@ const path = require("path");
 const nearley = require("nearley");
 const grammar = nearley.Grammar.fromCompiled(require("./grammar"));
 
-const parseAtFile = (file, end = [], processedFiles = []) => {
+const parseAtFile = (file, processedFiles = []) => {
     // Сохраняем информацию, что файл обработан.
     processedFiles.push(path.normalize(file));
 
@@ -32,7 +32,7 @@ const parseAtFile = (file, end = [], processedFiles = []) => {
             return;
         }    
 
-        const data = parseAtFile(src, end, processedFiles);
+        const data = parseAtFile(src, processedFiles);
 
         Object.entries(data.types).forEach(([key, value]) => types[key] = value);
     };
@@ -140,8 +140,6 @@ const parseAtFile = (file, end = [], processedFiles = []) => {
     };
 
     results.forEach((item) => mapResult(types, item));
-
-    end.forEach((callback) => callback());
 
     return {
         types,

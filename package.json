@@ -7,6 +7,9 @@
     "build": "nearleyc grammar/anytype.ne -o grammar/index.js",
     "test": "npm run build && node index.spec.js"
   },
+  "bin": {
+    "atc": "./cli.js"
+  },
   "keywords": [
     "xml",
     "validation",
@@ -15,10 +18,10 @@
   "author": "Sergei Terehov",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.20.0",
     "nearley": "^2.16.0",
     "xml2js": "^0.4.19"
   },
-  "devDependencies": {
-    "chalk": "^2.4.2"
-  }
+  "devDependencies": {}
 }
