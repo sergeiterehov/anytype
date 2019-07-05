@@ -21,7 +21,7 @@ defined UniversalExtendedCardWidgetData (This is widgets data!) is object (
                 option isGood - Boolean,
                 option arrow - single object (
                     required nDirection - integer,
-                    option isGood - Boolean
+                    option isGood - one of (with Boolean)
                 )
             )
         )

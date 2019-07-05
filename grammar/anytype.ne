@@ -42,8 +42,13 @@ Pair -> Uses __ CommentedName __ "-" __ Type {% (d) => ({$: "pair", uses: d[0].u
 Uses -> ("required" | "option") {% (d) => ({$: "uses", uses: d[0][0]}) %}
 
 TypeList ->
-	Type
-	| TypeList _ "," _ Type {% (d) => [...d[0], d[4]] %}
+	_typeOfList
+	| TypeList _ "," _ _typeOfList {% (d) => [...d[0], d[4]] %}
+	
+_typeOfList ->
+	Type {% id %}
+	| "with" __ Name {% (d) => ({$: "with", name: d[2].name}) %}
+	| "with" __ String {% (d) => ({$: "with", name: d[2]}) %}
 
 PairList ->
 	_pairOfList
@@ -52,6 +57,7 @@ PairList ->
 _pairOfList ->
 	Pair {% id %}
 	| "with" __ Name {% (d) => ({$: "with", name: d[2].name}) %}
+	| "with" __ String {% (d) => ({$: "with", name: d[2]}) %}
 
 ListBody ->
 	"(" _ TypeList _ ")" {% (d) => d[2] %}
