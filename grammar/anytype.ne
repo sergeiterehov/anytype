@@ -76,9 +76,13 @@ CommentedName ->
 _name -> [a-zA-Z_] {% id %}
 	| _name [\w_] {% (d) => d[0] + d[1] %}
 
-Float -> Integer "." Integer   {% (d) => parseFloat(d[0] + d[1] + d[2]) %}
+Float -> Integer "." UnsignedInteger   {% (d) => parseFloat(d[0] + d[1] + d[2]) %}
 
-Integer -> [0-9]:+ {% (d) => Number(d[0].join("")) %}
+Integer ->
+	UnsignedInteger {% id %}
+	| [\+\-] UnsignedInteger {% (d) => d[0] === "-" ? 0 - d[1] : d[1] %}
+
+UnsignedInteger -> [0-9]:+ {% (d) => Number(d[0].join("")) %}
 
 String -> "\"" _string "\"" {% (d) => d[1] %}
  

@@ -3,6 +3,11 @@ defined Boolean is one of (
     value 0
 )
 
+defined Tristate is one of (
+    with Boolean,
+    value -1
+)
+
 defined Measure is object (
     option sMeasureName_RU - string,
     option sMeasureName_EN - string
