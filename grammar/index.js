@@ -25,10 +25,10 @@ var grammar = {
     {"name": "Statements", "symbols": ["Statement"]},
     {"name": "Statements", "symbols": ["Statements", "__", "Statement"], "postprocess": (d) => [...d[0], d[2]]},
     {"name": "Statement$string$1", "symbols": [{"literal":"d"}, {"literal":"e"}, {"literal":"f"}, {"literal":"i"}, {"literal":"n"}, {"literal":"e"}, {"literal":"d"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "Statement", "symbols": ["Statement$string$1", "__", "Name", "__", "Type"], "postprocess": (d) => ({$: "definition", name: d[2].name, type: d[4]})},
+    {"name": "Statement", "symbols": ["Statement$string$1", "__", "CommentedName", "__", "Type"], "postprocess": (d) => ({$: "definition", name: d[2].name, type: d[4], comment: d[2].comment})},
     {"name": "Statement$string$2", "symbols": [{"literal":"d"}, {"literal":"e"}, {"literal":"f"}, {"literal":"i"}, {"literal":"n"}, {"literal":"e"}, {"literal":"d"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Statement$string$3", "symbols": [{"literal":"i"}, {"literal":"s"}], "postprocess": function joiner(d) {return d.join('');}},
-    {"name": "Statement", "symbols": ["Statement$string$2", "__", "Name", "__", "Statement$string$3", "__", "Type"], "postprocess": (d) => ({$: "definition", name: d[2].name, type: d[6]})},
+    {"name": "Statement", "symbols": ["Statement$string$2", "__", "CommentedName", "__", "Statement$string$3", "__", "Type"], "postprocess": (d) => ({$: "definition", name: d[2].name, type: d[6], comment: d[2].comment})},
     {"name": "Type$string$1", "symbols": [{"literal":"o"}, {"literal":"n"}, {"literal":"e"}, {"literal":" "}, {"literal":"o"}, {"literal":"f"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Type", "symbols": ["Type$string$1", "_", "ListBody"], "postprocess": (d) => ({$: "type_rule", type_rule: "one_of", types: d[2]})},
     {"name": "Type$string$2", "symbols": [{"literal":"o"}, {"literal":"b"}, {"literal":"j"}, {"literal":"e"}, {"literal":"c"}, {"literal":"t"}], "postprocess": function joiner(d) {return d.join('');}},
@@ -48,7 +48,7 @@ var grammar = {
     {"name": "Type$string$10", "symbols": [{"literal":"v"}, {"literal":"a"}, {"literal":"l"}, {"literal":"u"}, {"literal":"e"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Type", "symbols": ["Type$string$10", "__", "Integer"], "postprocess": (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]})},
     {"name": "Type", "symbols": ["Name"], "postprocess": (d) => ({$: "type_rule", type_rule: "name", name: d[0].name})},
-    {"name": "Pair", "symbols": ["Uses", "__", "Name", "__", {"literal":"-"}, "__", "Type"], "postprocess": (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6]})},
+    {"name": "Pair", "symbols": ["Uses", "__", "CommentedName", "__", {"literal":"-"}, "__", "Type"], "postprocess": (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6], comment: d[2].comment})},
     {"name": "Uses$subexpression$1$string$1", "symbols": [{"literal":"r"}, {"literal":"e"}, {"literal":"q"}, {"literal":"u"}, {"literal":"i"}, {"literal":"r"}, {"literal":"e"}, {"literal":"d"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "Uses$subexpression$1", "symbols": ["Uses$subexpression$1$string$1"]},
     {"name": "Uses$subexpression$1$string$2", "symbols": [{"literal":"o"}, {"literal":"p"}, {"literal":"t"}, {"literal":"i"}, {"literal":"o"}, {"literal":"n"}], "postprocess": function joiner(d) {return d.join('');}},
@@ -66,6 +66,8 @@ var grammar = {
     {"name": "ObjectBody", "symbols": [{"literal":"("}, "_", "PairList", "_", {"literal":")"}], "postprocess": (d) => d[2]},
     {"name": "ObjectBody", "symbols": [{"literal":"("}, "_", {"literal":")"}]},
     {"name": "Name", "symbols": ["_name"], "postprocess": (d) => ({$: "name", name: d[0]})},
+    {"name": "CommentedName", "symbols": ["Name"], "postprocess": id},
+    {"name": "CommentedName", "symbols": ["Name", "__", "HumanComment"], "postprocess": (d) => ({...d[0], comment: d[2]})},
     {"name": "_name", "symbols": [/[a-zA-Z_]/], "postprocess": id},
     {"name": "_name", "symbols": ["_name", /[\w_]/], "postprocess": (d) => d[0] + d[1]},
     {"name": "Float", "symbols": ["Integer", {"literal":"."}, "Integer"], "postprocess": (d) => parseFloat(d[0] + d[1] + d[2])},
@@ -76,7 +78,13 @@ var grammar = {
     {"name": "_string", "symbols": [], "postprocess": () => ""},
     {"name": "_string", "symbols": ["_string", "_stringchar"], "postprocess": (d) => d[0] + d[1]},
     {"name": "_stringchar", "symbols": [/[^\\"]/], "postprocess": id},
-    {"name": "_stringchar", "symbols": [{"literal":"\\"}, /[^]/], "postprocess": (d) => JSON.parse("\"" + d[0] + d[1] + "\"")}
+    {"name": "_stringchar", "symbols": [{"literal":"\\"}, /[^]/], "postprocess": (d) => JSON.parse("\"" + d[0] + d[1] + "\"")},
+    {"name": "HumanComment", "symbols": [{"literal":"("}, "_humanComment", {"literal":")"}], "postprocess": (d) => d[1]},
+    {"name": "_humanComment", "symbols": [], "postprocess": () => ""},
+    {"name": "_humanComment$ebnf$1", "symbols": [/[а-яА-Яa-zA-Z\-_\,\.\!\;\:\+\`\?\\\/\'\"\@\#\$\*\s\t\n]/]},
+    {"name": "_humanComment$ebnf$1", "symbols": ["_humanComment$ebnf$1", /[а-яА-Яa-zA-Z\-_\,\.\!\;\:\+\`\?\\\/\'\"\@\#\$\*\s\t\n]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "_humanComment", "symbols": ["_humanComment$ebnf$1"], "postprocess": (d) => d[0].join('')},
+    {"name": "_humanComment", "symbols": ["_humanComment", "HumanComment", "_humanComment"], "postprocess": (d) => `${d[0]}(${d[1]})${d[2]}`}
 ]
   , ParserStart: "File"
 }

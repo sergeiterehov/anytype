@@ -1,10 +1,13 @@
 import "../helpers"
 
-defined UniversalExtendedCardWidgetData is object (
+defined UniversalExtendedCardWidgetData (This is widgets data!) is object (
     option line - array [0..1000] of object (
         required yCoordFrom - integer
     ),
-    required cell - array [0..1000] of object (
+    required cell (
+        Это русский комментарий...
+        And this text (with brackets) and more.
+    ) - array [0..1000] of object (
         required nXCoord - integer,
         required nYCoord - integer,
         required object - array of one of (

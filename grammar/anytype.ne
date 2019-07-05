@@ -22,8 +22,8 @@ Statements ->
     | Statements __ Statement {% (d) => [...d[0], d[2]] %}
 
 Statement ->
-	"defined" __ Name __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[4]}) %}
-	| "defined" __ Name __ "is" __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[6]}) %}
+	"defined" __ CommentedName __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[4], comment: d[2].comment}) %}
+	| "defined" __ CommentedName __ "is" __ Type {% (d) => ({$: "definition", name: d[2].name, type: d[6], comment: d[2].comment}) %}
 
 Type ->
 	"one of" _ ListBody {% (d) => ({$: "type_rule", type_rule: "one_of", types: d[2]}) %}
@@ -36,7 +36,7 @@ Type ->
 	| "value" __ Integer {% (d) => ({$: "type_rule", type_rule: "value", type: "integer", value: d[2]}) %}
 	| Name {% (d) => ({$: "type_rule", type_rule: "name", name: d[0].name}) %}
 
-Pair -> Uses __ Name __ "-" __ Type {% (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6]}) %}
+Pair -> Uses __ CommentedName __ "-" __ Type {% (d) => ({$: "pair", uses: d[0].uses, name: d[2].name, type: d[6], comment: d[2].comment}) %}
 
 Uses -> ("required" | "option") {% (d) => ({$: "uses", uses: d[0][0]}) %}
 
@@ -61,6 +61,10 @@ ObjectBody ->
 	| "(" _ ")"
 
 Name -> _name {% (d) => ({$: "name", name: d[0]}) %}
+
+CommentedName ->
+	Name {% id %}
+	| Name __ HumanComment {% (d) => ({...d[0], comment: d[2]}) %}
  
 _name -> [a-zA-Z_] {% id %}
 	| _name [\w_] {% (d) => d[0] + d[1] %}
@@ -78,3 +82,10 @@ _string ->
 _stringchar ->
 	[^\\"] {% id %}
 	| "\\" [^] {% (d) => JSON.parse("\"" + d[0] + d[1] + "\"") %}
+
+HumanComment -> "(" _humanComment ")" {% (d) => d[1] %}
+
+_humanComment ->
+	null {% () => "" %}
+	| [а-яА-Яa-zA-Z\-_\,\.\!\;\:\+\`\?\\\/\'\"\@\#\$\*\s\t\n]:+ {% (d) => d[0].join('') %}
+	| _humanComment HumanComment _humanComment {% (d) => `${d[0]}(${d[1]})${d[2]}` %}

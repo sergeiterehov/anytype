@@ -35,6 +35,7 @@ const getAtsParser = (getSourceByName) => {
             setType(types, def.name, def.type);
     
             types[def.name].defined = true;
+            types[def.name].documentation = def.comment;
         };
     
         const setType = (types, path, type) => {
@@ -58,6 +59,7 @@ const getAtsParser = (getSourceByName) => {
                             name: field.name,
                             uses: field.uses,
                             type: setType(types, `${path}.${field.name}`, field.type),
+                            documentation: field.comment,
                         };
                     }),
                 };
