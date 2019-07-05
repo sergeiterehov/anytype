@@ -58,7 +58,7 @@ var grammar = {
     {"name": "Uses", "symbols": ["Uses$subexpression$1"], "postprocess": (d) => ({$: "uses", uses: d[0][0]})},
     {"name": "TypeList", "symbols": ["_typeOfList"]},
     {"name": "TypeList", "symbols": ["TypeList", "_", {"literal":","}, "_", "_typeOfList"], "postprocess": (d) => [...d[0], d[4]]},
-    {"name": "_typeOfList", "symbols": ["Type"], "postprocess": id},
+    {"name": "_typeOfList", "symbols": ["Type"], "postprocess": (d) => ({$: "type_item", type: d[0]})},
     {"name": "_typeOfList$string$1", "symbols": [{"literal":"w"}, {"literal":"i"}, {"literal":"t"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "_typeOfList", "symbols": ["_typeOfList$string$1", "__", "Name"], "postprocess": (d) => ({$: "with", name: d[2].name})},
     {"name": "_typeOfList$string$2", "symbols": [{"literal":"w"}, {"literal":"i"}, {"literal":"t"}, {"literal":"h"}], "postprocess": function joiner(d) {return d.join('');}},

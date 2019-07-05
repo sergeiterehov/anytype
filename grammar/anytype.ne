@@ -46,7 +46,7 @@ TypeList ->
 	| TypeList _ "," _ _typeOfList {% (d) => [...d[0], d[4]] %}
 	
 _typeOfList ->
-	Type {% id %}
+	Type {% (d) => ({$: "type_item", type: d[0]}) %}
 	| "with" __ Name {% (d) => ({$: "with", name: d[2].name}) %}
 	| "with" __ String {% (d) => ({$: "with", name: d[2]}) %}
 

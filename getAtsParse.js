@@ -54,14 +54,7 @@ const getAtsParser = (getSourceByName) => {
             if (type.type_rule === "object") {
                 const rule = {
                     $: "object",
-                    fields: type.fields.filter((field) => field.$ === "pair").map((field) => {
-                        return {
-                            name: field.name,
-                            uses: field.uses,
-                            type: setType(types, `${path}.${field.name}`, field.type),
-                            documentation: field.comment,
-                        };
-                    }),
+                    fields: [],
                 };
     
                 type.fields.filter((field) => field.$ === "with").forEach((item) => {
@@ -70,18 +63,47 @@ const getAtsParser = (getSourceByName) => {
                     if (! type) {
                         throw new Error(`Object "${item.name}" not found`);
                     }
+
+                    if (type.$ !== "object") {
+                        throw new Error(`Type "${item.name}" is not object (is ${type.$})`);
+                    }
     
                     rule.fields.push(...type.fields);
                 });
+
+                type.fields.filter((field) => field.$ === "pair").forEach((field) => {
+                    rule.fields.push({
+                        name: field.name,
+                        uses: field.uses,
+                        type: setType(types, `${path}.${field.name}`, field.type),
+                        documentation: field.comment,
+                    });
+                })
     
                 types[path] = rule;
             } else if (type.type_rule === "one_of") {
                 const rule = {
                     $: "one_of",
-                    types: type.types.map((type, i) => {
-                        return setType(types, `${path}(${i})`, type);
-                    }),
+                    types: [],
                 };
+
+                type.types.filter((item) => item.$ === "with").forEach((item) => {
+                    const type = types[item.name];
+    
+                    if (! type) {
+                        throw new Error(`List "${item.name}" not found`);
+                    }
+
+                    if (type.$ !== "one_of") {
+                        throw new Error(`Type "${item.name}" is not list (is ${type.$})`);
+                    }
+    
+                    rule.types.push(...type.types);
+                });
+
+                type.types.filter((field) => field.$ === "type_item").forEach((type, i) => {
+                    rule.types.push(setType(types, `${path}(${i})`, type.type));
+                })
     
                 types[path] = rule;
             } else if (type.type_rule === "array_of") {
