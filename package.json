@@ -1,8 +1,12 @@
 {
   "name": "anytype",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Validator",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sergeiterehov/anytype.git"
+  },
   "scripts": {
     "build": "nearleyc grammar/anytype.ne -o grammar/index.js",
     "test": "npm run build && node index.spec.js"
