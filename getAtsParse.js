@@ -56,6 +56,16 @@ const getAtsParser = (getSourceByName) => {
                     $: "object",
                     fields: [],
                 };
+
+                const addField = (field) => {
+                    const index = rule.fields.findIndex((f) => f.name === field.name);
+
+                    if (-1 !== index) {
+                        rule.fields.splice(index, 1);
+                    }
+
+                    rule.fields.push(field);
+                };
     
                 type.fields.filter((field) => field.$ === "with").forEach((item) => {
                     const type = types[item.name];
@@ -68,17 +78,17 @@ const getAtsParser = (getSourceByName) => {
                         throw new Error(`Type "${item.name}" is not object (is ${type.$})`);
                     }
     
-                    rule.fields.push(...type.fields);
+                    type.fields.forEach(addField);
                 });
 
                 type.fields.filter((field) => field.$ === "pair").forEach((field) => {
-                    rule.fields.push({
+                    addField({
                         name: field.name,
                         uses: field.uses,
                         type: setType(types, `${path}.${field.name}`, field.type),
                         documentation: field.comment,
                     });
-                })
+                });
     
                 types[path] = rule;
             } else if (type.type_rule === "one_of") {
